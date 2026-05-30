@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandran Interactive</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;900&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #030303;
+    --deep: #0a0808;
+    --red: #8b1a1a;
+    --red-bright: #c0392b;
+    --gold: #b8860b;
+    --gold-light: #d4a843;
+    --white: #f0ebe3;
+    --grey: #6b6560;
+    --grey-light: #9e9690;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* TV STATIC CANVAS */
+  #tv-static {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 998;
+    opacity: 0.05;
+    mix-blend-mode: screen;
+  }
+
+  /* LANG TOGGLE */
+  .lang-toggle {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 100;
+    display: flex;
+    gap: 0.5rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+  }
+
+  .lang-btn {
+    background: none;
+    border: 1px solid var(--grey);
+    color: var(--grey-light);
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+  }
+
+  .lang-btn.active, .lang-btn:hover {
+    border-color: var(--gold-light);
+    color: var(--gold-light);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to bottom, transparent, var(--black));
+    pointer-events: none;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 50% 40%, rgba(139,26,26,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(184,134,11,0.04) 0%, transparent 40%);
+  }
+
+  .logo-mark {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    line-height: 1;
+    animation: fadeUp 1.2s ease forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .logo-sub {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.6rem, 1.5vw, 0.85rem);
+    letter-spacing: 0.5em;
+    color: var(--red-bright);
+    margin-top: 0.5rem;
+    animation: fadeUp 1.2s ease 0.3s forwards;
+    opacity: 0;
+    transform: translateY(20px);
+    text-transform: uppercase;
+  }
+
+  .divider {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 2rem auto;
+    animation: fadeUp 1s ease 0.6s forwards;
+    opacity: 0;
+  }
+
+  .hero-tagline {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--grey-light);
+    letter-spacing: 0.05em;
+    animation: fadeUp 1s ease 0.8s forwards;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(3,3,3,0.9), transparent);
+  }
+
+  .nav-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: var(--grey-light);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+
+  /* GAMES SECTION */
+  .section {
+    padding: 8rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--red-bright);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 4rem;
+    color: var(--white);
+  }
+
+  /* GAME CARD — COMING SOON */
+  .game-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    padding: 3rem;
+    border: 1px solid rgba(184,134,11,0.15);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.5s;
+  }
+
+  .game-card:hover { border-color: rgba(184,134,11,0.4); }
+
+  .game-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(139,26,26,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .game-visual {
+    aspect-ratio: 16/9;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .game-visual-inner {
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7)),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.01) 2px,
+        rgba(255,255,255,0.01) 4px
+      );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .coming-soon-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--gold-light);
+    border: 1px solid var(--gold);
+    padding: 0.5rem 1.5rem;
+    text-transform: uppercase;
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .game-info { position: relative; z-index: 1; }
+
+  .game-studio {
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.35em;
+    color: var(--red-bright);
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+
+  .game-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 1.2rem;
+    color: var(--white);
+  }
+
+  .game-desc {
+    font-size: 1.05rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--grey-light);
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  .game-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    font-family: 'Cinzel', serif;
+    font-size: 0.5rem;
+    letter-spacing: 0.2em;
+    color: var(--grey);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 0.3rem 0.8rem;
+    text-transform: uppercase;
+  }
+
+  .btn {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    border: 1px solid var(--red);
+    padding: 0.9rem 2rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--red);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: -1;
+  }
+
+  .btn:hover::before { transform: translateX(0); }
+  .btn:hover { color: var(--white); }
+
+  /* ABOUT */
+  .about-section {
+    padding: 6rem 2rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .about-inner {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .about-text {
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-weight: 300;
+    line-height: 1.9;
+    color: var(--grey-light);
+    font-style: italic;
+  }
+
+  .about-text strong {
+    color: var(--white);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* SOCIAL */
+  .social-section {
+    padding: 5rem 2rem;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .social-link {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--grey-light);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .social-link:hover { color: var(--gold-light); }
+
+  .social-link svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  footer p {
+    font-family: 'Cinzel', serif;
+    font-size: 0.5rem;
+    letter-spacing: 0.3em;
+    color: var(--grey);
+    text-transform: uppercase;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .game-card { grid-template-columns: 1fr; gap: 2rem; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .lang-toggle { top: 1rem; right: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">Mandran Interactive</a>
+  <ul class="nav-links">
+    <li><a href="#games" data-en="Games" data-es="Juegos">Games</a></li>
+    <li><a href="#about" data-en="About" data-es="Nosotros">About</a></li>
+    <li><a href="#contact" data-en="Contact" data-es="Contacto">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="lang-toggle">
+  <button class="lang-btn active" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('es')">ES</button>
+</div>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="logo-mark">MANDRAN</div>
+  <div class="logo-sub">Interactive</div>
+  <div class="divider"></div>
+  <p class="hero-tagline" data-en="Where fear lives between the walls." data-es="Donde el miedo vive entre las paredes.">Where fear lives between the walls.</p>
+</section>
+
+<section class="section" id="games">
+  <p class="section-label fade-in" data-en="Our Games" data-es="Nuestros Juegos">Our Games</p>
+  <h2 class="section-title fade-in" data-en="Coming Soon" data-es="Próximamente">Coming Soon</h2>
+
+  <div class="game-card fade-in">
+    <div class="game-visual">
+      <div class="game-visual-inner">
+        <span class="coming-soon-badge" data-en="Coming Soon" data-es="Próximamente">Coming Soon</span>
+      </div>
+    </div>
+    <div class="game-info">
+      <p class="game-studio">Mandran Interactive</p>
+      <h3 class="game-title">The Mercer's House</h3>
+      <p class="game-desc" data-en="You wake up in a place that shouldn't exist. The halls stretch endlessly. Something watches from the dark. And somewhere, deep inside, the truth about the Mercer family waits for you." data-es="Despiertas en un lugar que no debería existir. Los pasillos se extienden sin fin. Algo te observa desde la oscuridad. Y en algún lugar, en lo más profundo, la verdad sobre la familia Mercer te espera.">
+        You wake up in a place that shouldn't exist. The halls stretch endlessly. Something watches from the dark. And somewhere, deep inside, the truth about the Mercer family waits for you.
+      </p>
+      <div class="game-tags">
+        <span class="tag" data-en="Psychological Horror" data-es="Terror Psicológico">Psychological Horror</span>
+        <span class="tag">Godot 4</span>
+        <span class="tag" data-en="Liminal Space" data-es="Espacio Liminal">Liminal Space</span>
+        <span class="tag" data-en="3D" data-es="3D">3D</span>
+      </div>
+      <a href="https://mandran-interactive.itch.io/" target="_blank" class="btn" data-en="Follow on itch.io" data-es="Seguir en itch.io">Follow on itch.io</a>
+    </div>
+  </div>
+</section>
+
+<section class="about-section" id="about">
+  <div class="about-inner">
+    <p class="section-label fade-in" data-en="About Us" data-es="Sobre Nosotros">About Us</p>
+    <div class="divider" style="animation:none;opacity:1;margin:1rem auto 2rem;"></div>
+    <p class="about-text fade-in" data-en="<strong>Mandran Interactive</strong> is an independent studio dedicated to psychological horror. We believe fear is not found in monsters — it lives in silence, in empty corridors, in the things you almost see out of the corner of your eye. Our games are crafted to unsettle, to linger, to stay with you long after you've turned off the screen." data-es="<strong>Mandran Interactive</strong> es un estudio independiente dedicado al terror psicológico. Creemos que el miedo no se encuentra en los monstruos — vive en el silencio, en los pasillos vacíos, en las cosas que casi ves por el rabillo del ojo. Nuestros juegos están creados para inquietar, para persistir, para quedarse contigo mucho después de apagar la pantalla.">
+      <strong>Mandran Interactive</strong> is an independent studio dedicated to psychological horror. We believe fear is not found in monsters — it lives in silence, in empty corridors, in the things you almost see out of the corner of your eye. Our games are crafted to unsettle, to linger, to stay with you long after you've turned off the screen.
+    </p>
+  </div>
+</section>
+
+<section class="social-section" id="contact">
+  <p class="section-label fade-in" data-en="Find Us" data-es="Encuéntranos">Find Us</p>
+  <div class="social-links fade-in">
+    <a href="https://x.com/Mandran_interac" target="_blank" class="social-link">
+      <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.732-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <span data-en="Twitter / X" data-es="Twitter / X">Twitter / X</span>
+    </a>
+    <a href="https://www.youtube.com/channel/UCEKopq0Is8h_Fd3Afd-2Q7g" target="_blank" class="social-link">
+      <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      <span>YouTube</span>
+    </a>
+    <a href="https://mandran-interactive.itch.io/" target="_blank" class="social-link">
+      <svg viewBox="0 0 24 24"><path d="M3.13 1.338C2.08 1.96.02 4.328 0 4.95v.7c0 .9.84 1.65 1.6 1.65.92 0 1.68-.76 1.68-1.68 0 .92.74 1.68 1.66 1.68.92 0 1.68-.76 1.68-1.68 0 .92.74 1.68 1.66 1.68.46 0 .88-.2 1.18-.5.3.3.72.5 1.18.5.46 0 .88-.2 1.18-.5.3.3.72.5 1.18.5.92 0 1.66-.76 1.66-1.68 0 .92.76 1.68 1.68 1.68.92 0 1.66-.76 1.66-1.68 0 .92.76 1.68 1.68 1.68.76 0 1.6-.76 1.6-1.66v-.7c-.02-.62-2.08-2.96-3.13-3.6-3.22-.18-6.44-.18-9.66.018zM8.5 9.5v.002c-.46.02-2.86.18-3.94.44C3.14 10.28 2 11.6 2 13.5c0 2.34.04 4.5 1.12 6.04C4.2 21.06 6.2 22 9.98 22c3.78 0 5.8-.94 6.86-2.46C17.96 18 18 15.84 18 13.5c0-1.9-1.14-3.22-2.56-3.558-1.08-.26-3.48-.42-3.94-.44V9.5H8.5zm.02 2.48h2.96c.68 0 1.04.34 1.04 1v3c0 .66-.36 1-1.04 1H8.52c-.68 0-1.02-.34-1.02-1v-3c0-.66.34-1 1.02-1z"/></svg>
+      <span>itch.io</span>
+    </a>
+  </div>
+</section>
+
+<canvas id="tv-static"></canvas>
+
+<footer>
+  <p>© 2026 Mandran Interactive — All rights reserved</p>
+</footer>
+
+<script>
+  let currentLang = 'en';
+
+  function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+    
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const text = el.getAttribute(`data-${lang}`);
+      if (text) el.innerHTML = text;
+    });
+  }
+
+  // TV STATIC
+  const canvas = document.getElementById('tv-static');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function drawStatic() {
+    const w = canvas.width;
+    const h = canvas.height;
+    const imageData = ctx.createImageData(w, h);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const val = Math.random() > 0.5 ? 255 : 0;
+      data[i] = val;
+      data[i+1] = val;
+      data[i+2] = val;
+      data[i+3] = 255;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    requestAnimationFrame(drawStatic);
+  }
+  drawStatic();
+
+  // Intersection observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
